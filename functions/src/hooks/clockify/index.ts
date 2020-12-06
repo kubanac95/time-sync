@@ -169,7 +169,6 @@ router.post("/", async (req, res) => {
 
         await api
           .get<ActiveCollabResponseDocument<ActiveCollabTask>>(projectTaskURL)
-          .then(({ data }) => {})
           .catch(() => {
             // Unset the task_id if it is a deleted task
             task_id = null;
@@ -237,7 +236,6 @@ router.post("/", async (req, res) => {
 
         await api
           .get<ActiveCollabResponseDocument<ActiveCollabTask>>(projectTaskURL)
-          .then(({ data }) => {})
           .catch(() => {
             // Unset the task_id if it is a deleted task
             task_id = null;
