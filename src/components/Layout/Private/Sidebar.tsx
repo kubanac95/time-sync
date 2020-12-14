@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Layout, Menu } from "antd";
-import { DashboardOutlined } from "@ant-design/icons";
+import { DashboardOutlined, OrderedListOutlined } from "@ant-design/icons";
 
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -30,6 +30,9 @@ const Sidebar = ({ collapsed }: { collapsed: boolean }) => {
           <NavLink exact to="/">
             Dashboard
           </NavLink>
+        </Menu.Item>
+        <Menu.Item key="/task" icon={<OrderedListOutlined />}>
+          <NavLink to="/task">Tasks</NavLink>
         </Menu.Item>
       </Menu>
     </Layout.Sider>

@@ -53,7 +53,7 @@ const getTimeDocument = (id: string): Promise<TimeDocument | undefined> =>
 const getTaskDocument = (id: string): Promise<TaskDocument | undefined> =>
   db
     .collection("tasks")
-    .where("clockify.projectId", "==", id)
+    .where("clockify.id", "==", id)
     .limit(1)
     .get()
     .then((snapshot) => {
@@ -145,8 +145,6 @@ router.post("/", async (req, res) => {
     case "NEW_TIME_ENTRY": {
       const clockify_timeEntry = body as ClockifyEventTimeEntry;
 
-      const taskDocument = await getTaskDocument(clockify_timeEntry.projectId);
-
       const start = dayjs(new Date(clockify_timeEntry.timeInterval.start));
       const end = dayjs(new Date(clockify_timeEntry.timeInterval.end));
 
@@ -157,9 +155,15 @@ router.post("/", async (req, res) => {
         .duration(end.diff(start, "millisecond"))
         .format("HH:mm");
 
-      let task_id = taskDocument?.activecollab.id
-        ? parseInt(taskDocument?.activecollab.id, 10)
-        : null;
+      let task_id: number | undefined;
+
+      if (clockify_timeEntry.task?.id) {
+        const taskDocument = await getTaskDocument(clockify_timeEntry.task?.id);
+
+        if (taskDocument?.activecollab.id) {
+          task_id = parseInt(taskDocument?.activecollab.id, 10);
+        }
+      }
 
       /**
        * Check if tasks exists in ActiveCollab, if not remove the task and write the time on project level
@@ -171,7 +175,7 @@ router.post("/", async (req, res) => {
           .get<ActiveCollabResponseDocument<ActiveCollabTask>>(projectTaskURL)
           .catch(() => {
             // Unset the task_id if it is a deleted task
-            task_id = null;
+            task_id = undefined;
           });
       }
 
@@ -214,8 +218,6 @@ router.post("/", async (req, res) => {
     case "TIME_ENTRY_UPDATED": {
       const clockify_timeEntry = body as ClockifyEventTimeEntry;
 
-      const taskDocument = await getTaskDocument(clockify_timeEntry.projectId);
-
       // Prepare payload to be entered in ActiveCollab
       const start = dayjs(new Date(clockify_timeEntry.timeInterval.start));
       const end = dayjs(new Date(clockify_timeEntry.timeInterval.end));
@@ -224,9 +226,15 @@ router.post("/", async (req, res) => {
         .duration(end.diff(start, "millisecond"))
         .format("HH:mm");
 
-      let task_id = taskDocument?.activecollab.id
-        ? parseInt(taskDocument?.activecollab.id, 10)
-        : null;
+      let task_id: number | undefined;
+
+      if (clockify_timeEntry.task?.id) {
+        const taskDocument = await getTaskDocument(clockify_timeEntry.task?.id);
+
+        if (taskDocument?.activecollab.id) {
+          task_id = parseInt(taskDocument?.activecollab.id, 10);
+        }
+      }
 
       /**
        * Check if tasks exists in ActiveCollab, if not remove the task and write the time on project level
@@ -238,7 +246,7 @@ router.post("/", async (req, res) => {
           .get<ActiveCollabResponseDocument<ActiveCollabTask>>(projectTaskURL)
           .catch(() => {
             // Unset the task_id if it is a deleted task
-            task_id = null;
+            task_id = undefined;
           });
       }
 

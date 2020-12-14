@@ -7,4 +7,12 @@ const clockify = axios.create({
   },
 });
 
-export { clockify };
+const activecollab = axios.create({
+  baseURL: `https://app.activecollab.com/119944/api/v1`,
+  headers: {
+    "Content-Type": "application/json",
+    "X-Angie-AuthApiToken": "40-jZwg3WRbsVBNkJFnHIdLLp6KCQ1N5aroJ1gG9zdC",
+  },
+});
+
+export { clockify, activecollab };
