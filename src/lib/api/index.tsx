@@ -8,10 +8,10 @@ const clockify = axios.create({
 });
 
 const activecollab = axios.create({
-  baseURL: `https://app.activecollab.com/119944/api/v1`,
+  baseURL: `https://app.activecollab.com/${process.env.REACT_APP_ACTIVECOLLAB_CLIENT_ID}/api/v1`,
   headers: {
     "Content-Type": "application/json",
-    "X-Angie-AuthApiToken": "40-jZwg3WRbsVBNkJFnHIdLLp6KCQ1N5aroJ1gG9zdC",
+    "X-Angie-AuthApiToken": process.env.REACT_APP_ACTIVECOLLAB_SECRET_KEY,
   },
 });
 
