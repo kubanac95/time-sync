@@ -263,6 +263,21 @@ router.post<
         };
       }
 
+      if (taskLogSnapshot?.exists) {
+        const taskLogData = taskLogSnapshot?.data();
+
+        const activeCollabTask = await activeCollab.task
+          .find(parseInt(taskLogData.activecollab.id, 10))
+          .catch(() => undefined);
+
+        if (activeCollabTask) {
+          payload = {
+            ...payload,
+            task_id: activeCollabTask.id,
+          };
+        }
+      }
+
       const activeCollabTime = await activeCollab.time.create(payload);
 
       await TimeLog.create({
@@ -318,6 +333,21 @@ router.post<
           ...payload,
           task_id: activeCollabTask.id,
         };
+      }
+
+      if (taskLogSnapshot?.exists) {
+        const taskLogData = taskLogSnapshot?.data();
+
+        const activeCollabTask = await activeCollab.task
+          .find(parseInt(taskLogData.activecollab.id, 10))
+          .catch(() => undefined);
+
+        if (activeCollabTask) {
+          payload = {
+            ...payload,
+            task_id: activeCollabTask.id,
+          };
+        }
       }
 
       const timeSnapshot = await TimeLog.findOne("jira.id", worklogId);
