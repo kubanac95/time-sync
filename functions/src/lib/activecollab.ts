@@ -17,11 +17,11 @@ class Time {
       .then(({ data }) => data?.single);
   }
 
-  create(data: IActiveCollabTimeCreate) {
+  create(body: IActiveCollabTimeCreate) {
     return this.api
       .post<IActiveCollabResponseDocument<IActiveCollabTime>>(`/time-records`, {
         billable_status: 2,
-        ...data,
+        ...body,
       })
       .then(({ data }) => data?.single);
   }
@@ -30,23 +30,23 @@ class Time {
     return this.api(`/time-records/${id}`);
   }
 
-  async update(id: number, data: IActiveCollabTimeUpdate) {
+  async update(id: number, body: IActiveCollabTimeUpdate) {
     /**
      * Time log may have move to another task.
      * Check and move it if needed
      */
-    if (data.task_id) {
+    if (body.task_id) {
       const timeRecord = await this.find(id);
 
-      if (timeRecord.parent_id !== data.task_id) {
-        await this.move(id, { task_id: data.task_id });
+      if (timeRecord.parent_id !== body.task_id) {
+        await this.move(id, { task_id: body.task_id });
       }
     }
 
     return this.api
       .put<IActiveCollabResponseDocument<IActiveCollabTime>>(
         `/time-records/${id}`,
-        data
+        body
       )
       .then(({ data }) => data?.single);
   }
@@ -74,21 +74,21 @@ class Task {
   create({
     subscribers = [2],
     assignee_id = this.user_id,
-    ...data
+    ...body
   }: IActiveCollabTaskCreate) {
     return this.api
       .post<IActiveCollabResponseDocument<IActiveCollabTask>>(`/tasks`, {
-        ...data,
+        ...body,
         assignee_id,
         subscribers,
       })
       .then(({ data }) => data?.single);
   }
 
-  update(id: number, { subscribers = [2], ...data }: IActiveCollabTaskUpdate) {
+  update(id: number, { subscribers = [2], ...body }: IActiveCollabTaskUpdate) {
     return this.api
       .put<IActiveCollabResponseDocument<IActiveCollabTask>>(`/tasks/${id}`, {
-        ...data,
+        ...body,
         subscribers,
       })
       .then(({ data }) => data?.single);
