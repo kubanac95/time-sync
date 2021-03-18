@@ -20,7 +20,7 @@ class Time {
   create(body: IActiveCollabTimeCreate) {
     return this.api
       .post<IActiveCollabResponseDocument<IActiveCollabTime>>(`/time-records`, {
-        billable_status: 2,
+        billable_status: 1,
         ...body,
       })
       .then(({ data }) => data?.single);
