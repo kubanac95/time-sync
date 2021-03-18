@@ -32,6 +32,17 @@ class Time {
   static create(data: TimeDocument) {
     return db.collection("times").add(data);
   }
+
+  static update(
+    id: string,
+    data: {
+      activecollab: {
+        id: string;
+      };
+    }
+  ) {
+    return db.doc(`times/${id}`).update(data);
+  }
 }
 
 export default Time;

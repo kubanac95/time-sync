@@ -74,8 +74,6 @@ router.post<
     return res.status(500);
   }
 
-  console.log(req.body);
-
   const projectData = await ProjectLog.findOne(
     "activecollab.projectId",
     hook.activecollab.projectId
@@ -161,11 +159,33 @@ router.post<
 
       const taskLogData = taskLogSnapshot.data();
 
-      await activeCollab.task
-        .update(parseInt(taskLogData.activecollab.id, 10), payload)
-        .catch((error) => {
-          console.log(JSON.stringify(error));
+      let activeCollabTask = await activeCollab.task
+        .find(parseInt(taskLogData.activecollab.id, 10))
+        .catch(() => undefined);
+
+      /**
+       * Task ahs been removed from active collab,
+       * we need to add a new one
+       */
+      if (!activeCollabTask) {
+        activeCollabTask = await activeCollab.task.create(payload);
+
+        /**
+         * Update task log reference
+         */
+        await TaskLog.update(taskLogData.activecollab.id, {
+          activecollab: {
+            id: `${activeCollabTask.id}`,
+          },
         });
+
+        return res.sendStatus(200);
+      }
+
+      await activeCollab.task.update(
+        parseInt(taskLogData.activecollab.id, 10),
+        payload
+      );
 
       return res.sendStatus(200);
     }
@@ -195,7 +215,7 @@ router.post<
 });
 
 /**
- * https://0bc838fd4679.ngrok.io/hooks/jira/project/${project.id}/issue/${issue.id}/worklog/${worklog.id}
+ * https://bc2b36a45c2c.ngrok.io/time-sync-a450f/us-central1/hooks/jira/project/${project.id}/issue/${issue.id}/worklog/${worklog.id}
  * https://us-central1-time-sync-a450f.cloudfunctions.net/hooks/jira/project/${project.id}/issue/${issue.id}/worklog/${worklog.id}
  */
 router.post<
@@ -230,7 +250,7 @@ router.post<
 
       let payload: IActiveCollabTimeCreate = {
         value: dayjs.duration(end.diff(start, "millisecond")).format("HH:mm"),
-        record_date: dayjs(worklog.created).format("YYYY-MM-DD"),
+        record_date: dayjs(worklog.started).format("YYYY-MM-DD"),
         job_type_id: 12, //React
         summary: worklog.comment || "",
       };
@@ -302,7 +322,7 @@ router.post<
 
       let payload: IActiveCollabTimeCreate = {
         value: dayjs.duration(end.diff(start, "millisecond")).format("HH:mm"),
-        record_date: dayjs(worklog.created).format("YYYY-MM-DD"),
+        record_date: dayjs(worklog.started).format("YYYY-MM-DD"),
         job_type_id: 12, //React
         summary: worklog.comment || "",
       };
@@ -377,6 +397,32 @@ router.post<
 
       const timeLogData = timeSnapshot.data();
 
+      let activeCollabTime = await activeCollab.time.find(
+        parseInt(timeLogData.activecollab.id, 10)
+      );
+
+      /**
+       * Trying to update but te time log has been deleted from ActiveCollab.
+       * Creating new log
+       */
+      if (!activeCollabTime) {
+        activeCollabTime = await activeCollab.time.create(payload);
+
+        /**
+         * Update time log reference
+         */
+        await TimeLog.update(timeLogData.activecollab.id, {
+          activecollab: {
+            id: `${activeCollabTime.id}`,
+          },
+        });
+
+        return res.sendStatus(200);
+      }
+
+      /**
+       * Found the time log in ActiveCollab, go ahead and update it
+       */
       await activeCollab.time.update(
         parseInt(timeLogData.activecollab.id, 10),
         payload

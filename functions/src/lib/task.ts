@@ -32,6 +32,17 @@ class Task {
   static create(data: TaskDocument) {
     return db.collection("tasks").add(data);
   }
+
+  static update(
+    id: string,
+    data: {
+      activecollab: {
+        id: string;
+      };
+    }
+  ) {
+    return db.doc(`tasks/${id}`).update(data);
+  }
 }
 
 export default Task;
