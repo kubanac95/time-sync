@@ -118,7 +118,7 @@ router.post("/", async (req, res) => {
        * Create a task in ActiveCollab
        */
       return api
-        .post<ActiveCollabResponseDocument<ActiveCollabTask>>(
+        .post<IActiveCollabResponseDocument<IActiveCollabTask>>(
           `/projects/${hook.activecollab.projectId}/tasks`,
           payload
         )
@@ -172,7 +172,7 @@ router.post("/", async (req, res) => {
         const projectTaskURL = `/projects/${hook.activecollab.projectId}/tasks/${task_id}`;
 
         await api
-          .get<ActiveCollabResponseDocument<ActiveCollabTask>>(projectTaskURL)
+          .get<IActiveCollabResponseDocument<IActiveCollabTask>>(projectTaskURL)
           .catch(() => {
             // Unset the task_id if it is a deleted task
             task_id = undefined;
@@ -188,7 +188,7 @@ router.post("/", async (req, res) => {
       };
 
       return api
-        .post<ActiveCollabResponseDocument<ActiveCollabTimeRecord>>(
+        .post<IActiveCollabResponseDocument<IActiveCollabTime>>(
           `/projects/${hook.activecollab.projectId}/time-records`,
           payload
         )
@@ -243,7 +243,7 @@ router.post("/", async (req, res) => {
         const projectTaskURL = `/projects/${hook.activecollab.projectId}/tasks/${task_id}`;
 
         await api
-          .get<ActiveCollabResponseDocument<ActiveCollabTask>>(projectTaskURL)
+          .get<IActiveCollabResponseDocument<IActiveCollabTask>>(projectTaskURL)
           .catch(() => {
             // Unset the task_id if it is a deleted task
             task_id = undefined;
@@ -266,7 +266,7 @@ router.post("/", async (req, res) => {
       // No record found. In cases where we have old tasks but nio entires since integration was added later on
       if (!timeRecord) {
         return api
-          .post<ActiveCollabResponseDocument<ActiveCollabTimeRecord>>(
+          .post<IActiveCollabResponseDocument<IActiveCollabTime>>(
             `/projects/${hook.activecollab.projectId}/time-records`,
             payload
           )
@@ -307,9 +307,7 @@ router.post("/", async (req, res) => {
           });
 
       return api
-        .get<ActiveCollabResponseDocument<ActiveCollabTimeRecord>>(
-          timeRecordURL
-        )
+        .get<IActiveCollabResponseDocument<IActiveCollabTime>>(timeRecordURL)
         .then(({ data: { single } }) => {
           // ! Move time record to another task
           if (task_id && single.parent_id !== task_id) {
@@ -338,9 +336,7 @@ router.post("/", async (req, res) => {
       const timeRecordURL = `/projects/${hook.activecollab.projectId}/time-records/${timeRecord.activecollab.id}`;
 
       return api
-        .delete<ActiveCollabResponseDocument<ActiveCollabTimeRecord>>(
-          timeRecordURL
-        )
+        .delete<IActiveCollabResponseDocument<IActiveCollabTime>>(timeRecordURL)
         .then(() => {
           return res.sendStatus(200);
         })

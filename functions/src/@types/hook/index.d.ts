@@ -4,10 +4,13 @@ interface TimeDocument {
     parent_id: string;
     parent_type: string;
   };
-  clockify: {
+  clockify?: {
     id: string;
     projectId: string;
     workspaceId: string;
+  };
+  jira?: {
+    id: string;
   };
 }
 
@@ -15,9 +18,12 @@ interface TaskDocument {
   activecollab: {
     id: string;
   };
-  clockify: {
+  clockify?: {
     id: string;
     projectId: string;
+  };
+  jira?: {
+    id: string;
   };
 }
 
@@ -28,8 +34,20 @@ interface HookDocument {
     accountId: string;
     projectId: string;
   };
-  clockify: {
+  clockify?: {
     projectId: string;
     workspaceId: string;
+  };
+  jira?: {
+    projectId: string;
+    accountId: string;
+  };
+}
+
+interface ProjectDocument {
+  activecollab: {
+    projectId: string;
+    name?: string;
+    subscribers?: number[];
   };
 }

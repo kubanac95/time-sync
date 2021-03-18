@@ -70,26 +70,65 @@ interface ActiveCollabUser extends DataBaseRecord {
   first_login_on: number;
 }
 
-interface ActiveCollabTask {
-  id: string;
+interface IActiveCollabTask {
+  id: number;
   class: "Task";
   url_path: string;
   name: string;
   assignee_id: number;
+  body?: string;
+  body_formatted?: string;
 }
 
-interface ActiveCollabTimeRecord {
-  id: string;
+interface IActiveCollabTaskCreate {
+  name: string;
+  body?: string;
+  assignee_id?: number;
+  subscribers?: number[];
+}
+
+interface IActiveCollabTaskUpdate {
+  name?: string;
+  assignee_id?: number;
+  subscribers?: number[];
+}
+
+interface IActiveCollabTime {
+  id: number;
   class: "TimeRecord";
   url_path: string;
   value: number;
   record_date: number;
   parent_id: number;
   parent_type: "Task" | "Project";
+  billable_status: 0 | 1 | 2;
 }
 
-type ActiveCollabResponseDocument<T> = {
+interface IActiveCollabTimeCreate {
+  value: string;
+  record_date: string;
+  job_type_id: number;
+  summary: string;
+  task_id?: number;
+  billable_status?: 0 | 1 | 2 | undefined;
+}
+
+interface IActiveCollabTimeUpdate {
+  value: string;
+  record_date: string;
+  job_type_id: number;
+  summary: string;
+  task_id?: number;
+}
+
+// https://developers.activecollab.com/api-documentation/v1/projects/elements/time-records/time-records.html
+interface IActiveCollabTimeMove {
+  task_id?: number;
+  project_id?: number;
+}
+
+type IActiveCollabResponseDocument<T> = {
   single: T;
 };
 
-type ActiveCollabResponseDocumentCollection<T> = Array<T>;
+type IActiveCollabResponseDocumentCollection<T> = Array<T>;
