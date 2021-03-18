@@ -137,13 +137,15 @@ router.post<
         subscribers: projectData?.activecollab?.subscribers,
       };
 
+      let activeCollabTask: IActiveCollabTask | undefined;
+
       /**
        * Create a task because it is non existing
        *
        * @todo - Remove later
        */
       if (!taskLogSnapshot?.exists) {
-        const activeCollabTask = await activeCollab.task.create(payload);
+        activeCollabTask = await activeCollab.task.create(payload);
 
         await TaskLog.create({
           activecollab: {
@@ -159,7 +161,7 @@ router.post<
 
       const taskLogData = taskLogSnapshot.data();
 
-      let activeCollabTask = await activeCollab.task
+      activeCollabTask = await activeCollab.task
         .find(parseInt(taskLogData.activecollab.id, 10))
         .catch(() => undefined);
 
@@ -255,6 +257,8 @@ router.post<
         summary: worklog.comment || "",
       };
 
+      let activeCollabTask: IActiveCollabTask | undefined;
+
       /**
        * Create a task for this issue if there is none,
        * before writing the time log
@@ -262,7 +266,7 @@ router.post<
        * @todo - Remove later
        */
       if (!taskLogSnapshot?.exists) {
-        const activeCollabTask = await activeCollab.task.create({
+        activeCollabTask = await activeCollab.task.create({
           // Placeholder task name
           name: `[Jira #${issueId}]`,
           subscribers: projectData?.activecollab?.subscribers,
@@ -286,7 +290,7 @@ router.post<
       if (taskLogSnapshot?.exists) {
         const taskLogData = taskLogSnapshot?.data();
 
-        const activeCollabTask = await activeCollab.task
+        activeCollabTask = await activeCollab.task
           .find(parseInt(taskLogData.activecollab.id, 10))
           .catch(() => undefined);
 
@@ -327,6 +331,9 @@ router.post<
         summary: worklog.comment || "",
       };
 
+      let activeCollabTask: IActiveCollabTask | undefined;
+      let activeCollabTime: IActiveCollabTime | undefined;
+
       /**
        * Create a task for this issue if there is none,
        * before writing the time log
@@ -334,7 +341,7 @@ router.post<
        * @todo - Remove later
        */
       if (!taskLogSnapshot?.exists) {
-        const activeCollabTask = await activeCollab.task.create({
+        activeCollabTask = await activeCollab.task.create({
           // Placeholder task name
           name: `[Jira #${issueId}]`,
           subscribers: projectData?.activecollab?.subscribers,
@@ -358,7 +365,7 @@ router.post<
       if (taskLogSnapshot?.exists) {
         const taskLogData = taskLogSnapshot?.data();
 
-        const activeCollabTask = await activeCollab.task
+        activeCollabTask = await activeCollab.task
           .find(parseInt(taskLogData.activecollab.id, 10))
           .catch(() => undefined);
 
@@ -379,7 +386,7 @@ router.post<
        * @todo - Remove later
        */
       if (!timeSnapshot?.exists) {
-        const activeCollabTime = await activeCollab.time.create(payload);
+        activeCollabTime = await activeCollab.time.create(payload);
 
         await TimeLog.create({
           activecollab: {
@@ -397,7 +404,7 @@ router.post<
 
       const timeLogData = timeSnapshot.data();
 
-      let activeCollabTime = await activeCollab.time.find(
+      activeCollabTime = await activeCollab.time.find(
         parseInt(timeLogData.activecollab.id, 10)
       );
 
