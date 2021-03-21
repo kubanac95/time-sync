@@ -13,6 +13,8 @@ import TaskLog from "../../lib/task";
 import TimeLog from "../../lib/time";
 import ProjectLog from "../../lib/project";
 
+// Trigger CI
+
 dayjs.extend(duration);
 
 const db = firestore();
