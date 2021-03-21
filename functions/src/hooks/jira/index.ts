@@ -257,6 +257,12 @@ router.post<
         summary: worklog.comment || "",
       };
 
+      logger.log(
+        `[Webhook/Jira] worklog_created: Creating log for issue: ${issueId} based on worklog: ${JSON.stringify(
+          worklog
+        )} with payload: ${JSON.stringify(payload)}`
+      );
+
       let activeCollabTask: IActiveCollabTask | undefined;
 
       /**
@@ -330,6 +336,12 @@ router.post<
         job_type_id: 12, //React
         summary: worklog.comment || "",
       };
+
+      logger.log(
+        `[Webhook/Jira] worklog_updated: Updating log for issue: ${issueId} based on worklog: ${JSON.stringify(
+          worklog
+        )} with payload: ${JSON.stringify(payload)}`
+      );
 
       let activeCollabTask: IActiveCollabTask | undefined;
       let activeCollabTime: IActiveCollabTime | undefined;
