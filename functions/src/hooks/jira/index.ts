@@ -95,6 +95,12 @@ router.post<
         fields: { summary, description },
       } = issue;
 
+      logger.log(
+        `[Webhook/Jira] jira:issue_created: Creating task for issue: ${JSON.stringify(
+          issue
+        )}}`
+      );
+
       const activeCollabTask = await activeCollab.task.create({
         name: `[Jira #${issueId}]: ${issueKey} - ${summary}`,
         body: [
@@ -125,6 +131,12 @@ router.post<
         self: issueLink,
         fields: { summary, description },
       } = issue;
+
+      logger.log(
+        `[Webhook/Jira] jira:issue_update: Updating task for issue: ${JSON.stringify(
+          issue
+        )}}`
+      );
 
       const taskLogSnapshot = await TaskLog.findOne("jira.id", issueId);
 
@@ -200,6 +212,12 @@ router.post<
       if (!taskLogSnapshot?.exists) {
         return res.sendStatus(200);
       }
+
+      logger.log(
+        `[Webhook/Jira] jira:issue_deleted: Deleting task for issue: ${JSON.stringify(
+          issue
+        )}}`
+      );
 
       const taskLogData = taskLogSnapshot.data();
 
