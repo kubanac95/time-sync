@@ -286,7 +286,7 @@ router.post<
     hook.activecollab.projectId
   ).then((d) => d?.data());
 
-  const activeCollab = new ActiveCollab(hook.activecollab);
+  const AC = createActiveCollabInstance(hook.activecollab);
 
   switch (webhookEvent) {
     case "worklog_created": {
@@ -317,7 +317,7 @@ router.post<
        * @todo - Remove later
        */
       if (!taskLogSnapshot?.exists) {
-        activeCollabTask = await activeCollab.task.create({
+        activeCollabTask = await AC.task.create({
           // Placeholder task name
           name: `[Jira #${issueId}]`,
           subscribers: projectData?.activecollab?.subscribers,
@@ -341,7 +341,7 @@ router.post<
       if (taskLogSnapshot?.exists) {
         const taskLogData = taskLogSnapshot?.data();
 
-        activeCollabTask = await activeCollab.task
+        activeCollabTask = await AC.task
           .find(parseInt(taskLogData.activecollab.id, 10))
           .catch(() => undefined);
 
@@ -353,7 +353,7 @@ router.post<
         }
       }
 
-      const activeCollabTime = await activeCollab.time.create(payload);
+      const activeCollabTime = await AC.time.create(payload);
 
       await TimeLog.create({
         activecollab: {
@@ -398,7 +398,7 @@ router.post<
        * @todo - Remove later
        */
       if (!taskLogSnapshot?.exists) {
-        activeCollabTask = await activeCollab.task.create({
+        activeCollabTask = await AC.task.create({
           // Placeholder task name
           name: `[Jira #${issueId}]`,
           subscribers: projectData?.activecollab?.subscribers,
@@ -422,7 +422,7 @@ router.post<
       if (taskLogSnapshot?.exists) {
         const taskLogData = taskLogSnapshot?.data();
 
-        activeCollabTask = await activeCollab.task
+        activeCollabTask = await AC.task
           .find(parseInt(taskLogData.activecollab.id, 10))
           .catch(() => undefined);
 
@@ -443,7 +443,7 @@ router.post<
        * @todo - Remove later
        */
       if (!timeSnapshot?.exists) {
-        activeCollabTime = await activeCollab.time.create(payload);
+        activeCollabTime = await AC.time.create(payload);
 
         await TimeLog.create({
           activecollab: {
@@ -461,7 +461,7 @@ router.post<
 
       const timeLogData = timeSnapshot.data();
 
-      activeCollabTime = await activeCollab.time.find(
+      activeCollabTime = await AC.time.find(
         parseInt(timeLogData.activecollab.id, 10)
       );
 
@@ -470,7 +470,7 @@ router.post<
        * Creating new log
        */
       if (!activeCollabTime) {
-        activeCollabTime = await activeCollab.time.create(payload);
+        activeCollabTime = await AC.time.create(payload);
 
         /**
          * Update time log reference
@@ -487,10 +487,7 @@ router.post<
       /**
        * Found the time log in ActiveCollab, go ahead and update it
        */
-      await activeCollab.time.update(
-        parseInt(timeLogData.activecollab.id, 10),
-        payload
-      );
+      await AC.time.update(parseInt(timeLogData.activecollab.id, 10), payload);
 
       return res.sendStatus(200);
     }
@@ -504,9 +501,7 @@ router.post<
 
       const timeLogData = timeSnapshot.data();
 
-      await activeCollab.time
-        .delete(timeLogData.activecollab.id)
-        .catch(() => undefined);
+      await AC.time.delete(timeLogData.activecollab.id).catch(() => undefined);
 
       await timeSnapshot.ref.delete().catch(() => undefined);
 
