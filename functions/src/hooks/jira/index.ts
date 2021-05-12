@@ -85,7 +85,7 @@ router.post<
     return res.status(500);
   }
 
-  const activeCollab = new ActiveCollab(hook.activecollab);
+  const AC = new ActiveCollab(hook.activecollab);
 
   switch (webhookEvent) {
     case "jira:issue_created": {
@@ -101,7 +101,7 @@ router.post<
         )}}`
       );
 
-      const activeCollabTask = await activeCollab.task.create({
+      const activeCollabTask = await AC.task.create({
         name: `[Jira #${issueId}]: ${issueKey} - ${summary}`,
         body: [
           `<p><a href="${
@@ -149,17 +149,6 @@ router.post<
           `<p>${description}</p>`,
         ].join("<br />"),
         subscribers: projectData?.activecollab?.subscribers,
-        ...(!!resolutiondate
-          ? {
-              is_completed: true,
-              completed_on: dayjs(resolutiondate).valueOf(),
-              completed_by_id: activeCollab.user_id,
-            }
-          : {
-              is_completed: false,
-              completed_on: null,
-              completed_by_id: null,
-            }),
       };
 
       let activeCollabTask: IActiveCollabTask | undefined;
@@ -170,7 +159,7 @@ router.post<
        * @todo - Remove later
        */
       if (!taskLogSnapshot?.exists) {
-        activeCollabTask = await activeCollab.task.create(payload);
+        activeCollabTask = await AC.task.create(payload);
 
         await TaskLog.create({
           activecollab: {
@@ -186,7 +175,7 @@ router.post<
 
       const taskLogData = taskLogSnapshot.data();
 
-      activeCollabTask = await activeCollab.task
+      activeCollabTask = await AC.task
         .find(parseInt(taskLogData.activecollab.id, 10))
         .catch(() => undefined);
 
@@ -195,7 +184,7 @@ router.post<
        * we need to add a new one
        */
       if (!activeCollabTask) {
-        activeCollabTask = await activeCollab.task.create(payload);
+        activeCollabTask = await AC.task.create(payload);
 
         /**
          * Update task log reference
@@ -209,10 +198,18 @@ router.post<
         return res.sendStatus(200);
       }
 
-      await activeCollab.task.update(
+      activeCollabTask = await AC.task.update(
         parseInt(taskLogData.activecollab.id, 10),
         payload
       );
+
+      if (!activeCollabTask.is_completed && !!resolutiondate) {
+        await AC.task.complete(parseInt(taskLogData.activecollab.id, 10));
+      }
+
+      if (activeCollabTask.is_completed && !resolutiondate) {
+        await AC.task.open(parseInt(taskLogData.activecollab.id, 10));
+      }
 
       return res.sendStatus(200);
     }
@@ -232,7 +229,7 @@ router.post<
 
       const taskLogData = taskLogSnapshot.data();
 
-      await activeCollab.task
+      await AC.task
         .delete(parseInt(taskLogData.activecollab.id, 10))
         .catch(() => undefined);
 

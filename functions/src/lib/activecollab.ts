@@ -57,8 +57,8 @@ class Time {
 }
 
 class Task {
-  api: axios.AxiosInstance;
-  user_id: number;
+  private api: axios.AxiosInstance;
+  private user_id: number;
 
   constructor(api: axios.AxiosInstance, user_id: number) {
     this.api = api;
@@ -91,6 +91,20 @@ class Task {
         ...body,
         subscribers,
       })
+      .then(({ data }) => data?.single);
+  }
+
+  complete(id: number) {
+    return this.api
+      .put<IActiveCollabResponseDocument<IActiveCollabTask>>(
+        `/complete/task/${id}`
+      )
+      .then(({ data }) => data?.single);
+  }
+
+  open(id: number) {
+    return this.api
+      .put<IActiveCollabResponseDocument<IActiveCollabTask>>(`/open/task/${id}`)
       .then(({ data }) => data?.single);
   }
 
