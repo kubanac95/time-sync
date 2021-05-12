@@ -202,13 +202,13 @@ class ActiveCollab {
     >("/projects");
   }
 
-  static async login(data: LoginInput) {
-    sup.assert(data, LoginInputSchema);
+  static async login(input: LoginInput) {
+    sup.assert(input, LoginInputSchema);
 
     return axios.default
       .post<LoginResponse>(
         "https://my.activecollab.com/api/v1/external/login",
-        data
+        input
       )
       .then(({ data }) => {
         if (!data?.user?.intent) {
@@ -223,13 +223,13 @@ class ActiveCollab {
       });
   }
 
-  static issueToken(data: IssueTokenInput) {
-    sup.assert(data, IssueTokenInputSchema);
+  static issueToken(input: IssueTokenInput) {
+    sup.assert(input, IssueTokenInputSchema);
 
     return axios.default
       .post<IssueTokenResponse>(
-        `https://app.activecollab.com/${data.client_name}/api/v1`,
-        data
+        `https://app.activecollab.com/${input.client_name}/api/v1`,
+        input
       )
       .then(({ data }) => {
         if (!(data.is_ok && data.token)) {
