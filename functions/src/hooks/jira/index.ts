@@ -54,7 +54,7 @@ const createActiveCollabProjectInstance = (
   /**
    * Create project instance for AC account
    */
-  const project = account.project(parseInt(config.projectId, 10));
+  const project = account.Project(parseInt(config.projectId, 10));
 
   function onRejected(error: axios.AxiosError) {
     logger.error(`['ActiveCollab/api] error: `, error);

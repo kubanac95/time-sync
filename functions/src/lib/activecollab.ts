@@ -193,22 +193,32 @@ export class ActiveCollabAccount {
         "X-Angie-AuthApiToken": token,
       },
     });
+
+    function onRejected(error: axios.AxiosError) {
+      console.error(`['ActiveCollabAccount] error: `, error);
+
+      return Promise.reject(error);
+    }
+
+    this.api.interceptors.response.use(undefined, onRejected);
   }
 
-  project(id: number) {
+  Project(id: number) {
     return new Project(id, this.api);
   }
 
   projects() {
-    return this.api.get<
-      IActiveCollabResponseDocumentCollection<ActiveCollabProject>
-    >("/projects");
+    return this.api
+      .get<IActiveCollabResponseDocumentCollection<ActiveCollabProject>>(
+        "/projects"
+      )
+      .then(({ data }) => data);
   }
 
   users() {
-    return this.api.get<
-      IActiveCollabResponseDocumentCollection<ActiveCollabUser>
-    >("/users");
+    return this.api
+      .get<IActiveCollabResponseDocumentCollection<ActiveCollabUser>>("/users")
+      .then(({ data }) => data);
   }
 }
 
