@@ -239,7 +239,7 @@ class ActiveCollab {
 
     return axios.default
       .post<IssueTokenResponse>(
-        `https://app.activecollab.com/${input.client_name}/api/v1`,
+        `https://app.activecollab.com/${input.client_name}/api/v1/issue-token`,
         input
       )
       .then(({ data }) => {
