@@ -75,22 +75,21 @@ interface IActiveCollabTask {
   class: "Task";
   url_path: string;
   name: string;
-  assignee_id: number;
+  assignee_id?: number;
   body?: string;
   body_formatted?: string;
-}
-
-interface IActiveCollabTaskCreate {
-  name: string;
-  body?: string;
-  assignee_id?: number;
+  completed_on?: Nullable<number>;
+  completed_by_id?: Nullable<number>;
+  is_completed?: boolean;
   subscribers?: number[];
 }
 
-interface IActiveCollabTaskUpdate {
+interface IActiveCollabTaskCreate
+  extends Omit<IActiveCollabTask, "id" | "class" | "url_path"> {}
+
+interface IActiveCollabTaskUpdate
+  extends Omit<IActiveCollabTask, "id" | "class" | "url_path" | "name"> {
   name?: string;
-  assignee_id?: number;
-  subscribers?: number[];
 }
 
 interface IActiveCollabTime {

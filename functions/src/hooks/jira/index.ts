@@ -140,7 +140,7 @@ router.post<
 
       const taskLogSnapshot = await TaskLog.findOne("jira.id", issueId);
 
-      const payload = {
+      const payload: IActiveCollabTaskCreate = {
         name: `[Jira #${issueId}]: ${issueKey} - ${summary}`,
         body: [
           `<p><a href="${
@@ -149,7 +149,17 @@ router.post<
           `<p>${description}</p>`,
         ].join("<br />"),
         subscribers: projectData?.activecollab?.subscribers,
-        is_completed: !!resolutiondate,
+        ...(!!resolutiondate
+          ? {
+              is_completed: true,
+              completed_on: dayjs(resolutiondate).valueOf(),
+              completed_by_id: activeCollab.user_id,
+            }
+          : {
+              is_completed: false,
+              completed_on: null,
+              completed_by_id: null,
+            }),
       };
 
       let activeCollabTask: IActiveCollabTask | undefined;
