@@ -1,6 +1,10 @@
 import * as functions from "firebase-functions";
 
-import ActiveCollab, { IssueTokenInput } from "../../lib/activecollab";
+import ActiveCollab, {
+  IssueTokenInput,
+  ActiveCollabAccount,
+  IssueTokenResponse,
+} from "../../lib/activecollab";
 
 export default functions.https.onCall(
   async (data: IssueTokenInput, context) => {
@@ -11,7 +15,7 @@ export default functions.https.onCall(
       );
     }
 
-    let tokenResponse;
+    let tokenResponse: IssueTokenResponse;
 
     try {
       tokenResponse = await ActiveCollab.issueToken(data);
@@ -23,6 +27,19 @@ export default functions.https.onCall(
       );
     }
 
-    return tokenResponse;
+    const { token } = tokenResponse;
+
+    const account = new ActiveCollabAccount({
+      token,
+      accountId: data.client_name,
+    });
+
+    const projects = await account.projects();
+
+    return {
+      token: tokenResponse.token,
+      accountId: data.client_vendor,
+      projects,
+    };
   }
 );

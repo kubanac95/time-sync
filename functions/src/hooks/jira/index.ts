@@ -8,7 +8,7 @@ import { logger } from "firebase-functions";
 
 import * as duration from "dayjs/plugin/duration";
 
-import ActiveCollab from "../../lib/activecollab";
+import { ActiveCollabAccount } from "../../lib/activecollab";
 
 import TaskLog from "../../lib/task";
 import TimeLog from "../../lib/time";
@@ -40,10 +40,21 @@ const getHookDocument = (
     .catch(() => undefined);
 };
 
-const createActiveCollabInstance = (
+const createActiveCollabProjectInstance = (
   config: HookDocument["activecollab"]
-): ActiveCollab => {
-  const AC = new ActiveCollab(config);
+) => {
+  /**
+   * Create API instance for particular account
+   */
+  const account = new ActiveCollabAccount({
+    accountId: config.accountId,
+    token: config.token,
+  });
+
+  /**
+   * Create project instance for AC account
+   */
+  const project = account.project(parseInt(config.projectId, 10));
 
   function onRejected(error: axios.AxiosError) {
     logger.error(`['ActiveCollab/api] error: `, error);
@@ -51,9 +62,9 @@ const createActiveCollabInstance = (
     return Promise.reject(error);
   }
 
-  AC.api.interceptors.response.use(undefined, onRejected);
+  account.api.interceptors.response.use(undefined, onRejected);
 
-  return AC;
+  return project;
 };
 
 const router = express.Router();
@@ -102,7 +113,7 @@ router.post<
     return res.status(500);
   }
 
-  const AC = createActiveCollabInstance(hook.activecollab);
+  const AC = createActiveCollabProjectInstance(hook.activecollab);
 
   switch (webhookEvent) {
     case "jira:issue_created": {
@@ -121,10 +132,12 @@ router.post<
       const activeCollabTask = await AC.task.create({
         name: `[Jira #${issueId}]: ${issueKey} - ${summary}`,
         body: [
-          `<p><a href="${
-            new URL(issueLink).origin
-          }/browse/${issueKey}">${issueKey}</a></p>`,
-          `<p>${description}</p>`,
+          `<p>
+            <a href="${new URL(issueLink).origin}/browse/${issueKey}">
+              ${issueKey}
+            </a>
+          </p>`,
+          description && `<p>${description}</p>`,
         ].join("<br />"),
         subscribers: projectData?.activecollab?.subscribers,
       });
@@ -160,10 +173,12 @@ router.post<
       const payload: IActiveCollabTaskCreate = {
         name: `[Jira #${issueId}]: ${issueKey} - ${summary}`,
         body: [
-          `<p><a href="${
-            new URL(issueLink).origin
-          }/browse/${issueKey}">${issueKey}</a></p>`,
-          `<p>${description}</p>`,
+          `<p>
+            <a href="${new URL(issueLink).origin}/browse/${issueKey}">
+              ${issueKey}
+            </a>
+          </p>`,
+          description && `<p>${description}</p>`,
         ].join("<br />"),
         subscribers: projectData?.activecollab?.subscribers,
       };
@@ -286,7 +301,7 @@ router.post<
     hook.activecollab.projectId
   ).then((d) => d?.data());
 
-  const AC = createActiveCollabInstance(hook.activecollab);
+  const AC = createActiveCollabProjectInstance(hook.activecollab);
 
   switch (webhookEvent) {
     case "worklog_created": {

@@ -34,26 +34,19 @@ export type IssueTokenInput = sup.Infer<typeof IssueTokenInputSchema>;
 
 export type IssueTokenResponse = { is_ok: boolean; token: string };
 
-interface Config {
-  user_id: number;
-  project_id: number;
-}
-
-class BaseElement {
+class Time {
+  id: number;
   api: axios.AxiosInstance;
-  config: Config;
 
-  constructor(api: axios.AxiosInstance, config: Config) {
+  constructor(id: number, api: axios.AxiosInstance) {
+    this.id = id;
     this.api = api;
-    this.config = config;
   }
-}
 
-class Time extends BaseElement {
   find(id: number | string) {
     return this.api
       .get<IActiveCollabResponseDocument<IActiveCollabTime>>(
-        `/projects/${this.config.project_id}/time-records/${id}`
+        `/projects/${this.id}/time-records/${id}`
       )
       .then(({ data }) => data?.single);
   }
@@ -61,7 +54,7 @@ class Time extends BaseElement {
   create(body: IActiveCollabTimeCreate) {
     return this.api
       .post<IActiveCollabResponseDocument<IActiveCollabTime>>(
-        `/projects/${this.config.project_id}/time-records`,
+        `/projects/${this.id}/time-records`,
         {
           billable_status: 1,
           ...body,
@@ -71,10 +64,7 @@ class Time extends BaseElement {
   }
 
   move(id: number | string, data: IActiveCollabTimeMove) {
-    return this.api.post(
-      `/projects/${this.config.project_id}/time-records/${id}`,
-      data
-    );
+    return this.api.post(`/projects/${this.id}/time-records/${id}`, data);
   }
 
   async update(id: number | string, body: IActiveCollabTimeUpdate) {
@@ -92,36 +82,44 @@ class Time extends BaseElement {
 
     return this.api
       .put<IActiveCollabResponseDocument<IActiveCollabTime>>(
-        `/projects/${this.config.project_id}/time-records/${id}`,
+        `/projects/${this.id}/time-records/${id}`,
         body
       )
       .then(({ data }) => data?.single);
   }
 
   delete(id: number | string) {
-    return this.api.delete(
-      `/projects/${this.config.project_id}/time-records/${id}`
-    );
+    return this.api.delete(`/projects/${this.id}/time-records/${id}`);
   }
 }
 
-class Task extends BaseElement {
+class Task {
+  id: number;
+  api: axios.AxiosInstance;
+
+  constructor(id: number, api: axios.AxiosInstance) {
+    this.id = id;
+    this.api = api;
+  }
+
   find(id: number | string) {
     return this.api
       .get<IActiveCollabResponseDocument<IActiveCollabTask>>(
-        `/projects/${this.config.project_id}/tasks/${id}`
+        `/projects/${this.id}/tasks/${id}`
       )
       .then(({ data }) => data?.single);
   }
 
   create({
     subscribers = [2],
-    assignee_id = this.config.user_id,
+    assignee_id = ActiveCollab.getUserFromToken(
+      this.api.defaults.headers["X-Angie-AuthApiToken"]
+    ),
     ...body
   }: IActiveCollabTaskCreate) {
     return this.api
       .post<IActiveCollabResponseDocument<IActiveCollabTask>>(
-        `/projects/${this.config.project_id}/tasks`,
+        `/projects/${this.id}/tasks`,
         {
           ...body,
           assignee_id,
@@ -137,7 +135,7 @@ class Task extends BaseElement {
   ) {
     return this.api
       .put<IActiveCollabResponseDocument<IActiveCollabTask>>(
-        `/projects/${this.config.project_id}/tasks/${id}`,
+        `/projects/${this.id}/tasks/${id}`,
         {
           ...body,
           subscribers,
@@ -147,7 +145,7 @@ class Task extends BaseElement {
   }
 
   delete(id: number | string) {
-    return this.api.delete(`/projects/${this.config.project_id}/tasks/${id}`);
+    return this.api.delete(`/projects/${this.id}/tasks/${id}`);
   }
 
   complete(id: number | string) {
@@ -165,35 +163,40 @@ class Task extends BaseElement {
   }
 }
 
-class Project extends BaseElement {}
-
-class ActiveCollab {
+class ActiveCollabProject {
+  id: number;
   api: axios.AxiosInstance;
-  user_id: number;
 
   time: Time;
   task: Task;
-  project: Project;
 
-  constructor(account: HookDocument["activecollab"]) {
+  constructor(id: number, api: axios.AxiosInstance) {
+    this.id = id;
+    this.api = api;
+
+    this.time = new Time(this.id, this.api);
+    this.task = new Task(this.id, this.api);
+  }
+}
+
+export class ActiveCollabAccount {
+  api: axios.AxiosInstance;
+  user_id: number;
+
+  constructor({ token, accountId }: { token: string; accountId: string }) {
+    this.user_id = ActiveCollab.getUserFromToken(token);
+
     this.api = axios.default.create({
-      baseURL: `https://app.activecollab.com/${account.accountId}/api/v1`,
+      baseURL: `https://app.activecollab.com/${accountId}/api/v1`,
       headers: {
         "Content-Type": "application/json",
-        "X-Angie-AuthApiToken": account.token,
+        "X-Angie-AuthApiToken": token,
       },
     });
+  }
 
-    this.user_id = ActiveCollab.getUserFromToken(account.token);
-
-    const config: Config = {
-      user_id: this.user_id,
-      project_id: parseInt(account.projectId, 10),
-    };
-
-    this.time = new Time(this.api, config);
-    this.task = new Task(this.api, config);
-    this.project = new Project(this.api, config);
+  project(id: number) {
+    return new ActiveCollabProject(id, this.api);
   }
 
   projects() {
@@ -202,6 +205,14 @@ class ActiveCollab {
     >("/projects");
   }
 
+  users() {
+    return this.api.get<
+      IActiveCollabResponseDocumentCollection<ActiveCollabUser>
+    >("/users");
+  }
+}
+
+class ActiveCollab {
   static async login(input: LoginInput) {
     sup.assert(input, LoginInputSchema);
 

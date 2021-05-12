@@ -7,5 +7,5 @@ admin.initializeApp();
  */
 export { default as hooks } from "./hooks";
 
-export { default as authActivecollabLogin } from "./auth/activecollab/login";
-export { default as authActivecollabIssueToken } from "./auth/activecollab/issueToken";
+export { default as authActivecollabLogin } from "./httpsCallable/activecollab/login";
+export { default as authActivecollabIssueToken } from "./httpsCallable/activecollab/issueToken";
