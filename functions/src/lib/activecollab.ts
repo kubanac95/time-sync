@@ -1,4 +1,38 @@
 import * as axios from "axios";
+import * as sup from "superstruct";
+
+const LoginInputSchema = sup.object({
+  email: sup.string(),
+  password: sup.string(),
+});
+
+export type LoginInput = sup.Infer<typeof LoginInputSchema>;
+
+export type LoginResponse = {
+  is_ok: boolean;
+  accounts: {
+    url: string;
+    name: number;
+    display_name: string;
+    class: string;
+  }[];
+  user: {
+    first_name: string;
+    last_name: string;
+    intent: string;
+    avatar_url: string;
+  };
+};
+
+const IssueTokenInputSchema = sup.object({
+  intent: sup.string(),
+  client_name: sup.string(),
+  client_vendor: sup.string(),
+});
+
+export type IssueTokenInput = sup.Infer<typeof IssueTokenInputSchema>;
+
+export type IssueTokenResponse = { is_ok: boolean; token: string };
 
 interface Config {
   user_id: number;
@@ -131,12 +165,15 @@ class Task extends BaseElement {
   }
 }
 
+class Project extends BaseElement {}
+
 class ActiveCollab {
   api: axios.AxiosInstance;
   user_id: number;
 
   time: Time;
   task: Task;
+  project: Project;
 
   constructor(account: HookDocument["activecollab"]) {
     this.api = axios.default.create({
@@ -156,6 +193,51 @@ class ActiveCollab {
 
     this.time = new Time(this.api, config);
     this.task = new Task(this.api, config);
+    this.project = new Project(this.api, config);
+  }
+
+  projects() {
+    return this.api.get<
+      IActiveCollabResponseDocumentCollection<ActiveCollabProject>
+    >("/projects");
+  }
+
+  static async login(data: LoginInput) {
+    sup.assert(data, LoginInputSchema);
+
+    return axios.default
+      .post<LoginResponse>(
+        "https://my.activecollab.com/api/v1/external/login",
+        data
+      )
+      .then(({ data }) => {
+        if (!data?.user?.intent) {
+          throw new Error("Failed to acquire access token");
+        }
+
+        if (!(Array.isArray(data?.accounts) && data?.accounts.length > 0)) {
+          throw new Error("Your are not linked to any account");
+        }
+
+        return data;
+      });
+  }
+
+  static issueToken(data: IssueTokenInput) {
+    sup.assert(data, IssueTokenInputSchema);
+
+    return axios.default
+      .post<IssueTokenResponse>(
+        `https://app.activecollab.com/${data.client_name}/api/v1`,
+        data
+      )
+      .then(({ data }) => {
+        if (!(data.is_ok && data.token)) {
+          throw new Error("Invalid credentials");
+        }
+
+        return data;
+      });
   }
 
   static getUserFromToken(token: string) {
