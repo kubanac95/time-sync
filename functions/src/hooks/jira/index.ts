@@ -1,4 +1,5 @@
 import * as dayjs from "dayjs";
+import * as axios from "axios";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 
@@ -37,6 +38,22 @@ const getHookDocument = (
       return snapshot.docs[0].data() as HookDocument;
     })
     .catch(() => undefined);
+};
+
+const createActiveCollabInstance = (
+  config: HookDocument["activecollab"]
+): ActiveCollab => {
+  const AC = new ActiveCollab(config);
+
+  function onRejected(error: axios.AxiosError) {
+    logger.error(`['ActiveCollab/api] error: `, error);
+
+    return Promise.reject(error);
+  }
+
+  AC.api.interceptors.response.use(undefined, onRejected);
+
+  return AC;
 };
 
 const router = express.Router();
@@ -85,7 +102,7 @@ router.post<
     return res.status(500);
   }
 
-  const AC = new ActiveCollab(hook.activecollab);
+  const AC = createActiveCollabInstance(hook.activecollab);
 
   switch (webhookEvent) {
     case "jira:issue_created": {
@@ -361,7 +378,7 @@ router.post<
       let payload: IActiveCollabTimeCreate = {
         value: dayjs.duration(end.diff(start, "millisecond")).format("HH:mm"),
         record_date: dayjs(worklog.started).format("YYYY-MM-DD"),
-        job_type_id: 12, //React
+        job_type_id: 12, // React(12), Design & Content & Editing(8)
         summary: worklog.comment || "",
       };
 
