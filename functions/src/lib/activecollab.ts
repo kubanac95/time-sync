@@ -163,7 +163,7 @@ class Task {
   }
 }
 
-class ActiveCollabProject {
+class Project {
   id: number;
   api: axios.AxiosInstance;
 
@@ -196,7 +196,7 @@ export class ActiveCollabAccount {
   }
 
   project(id: number) {
-    return new ActiveCollabProject(id, this.api);
+    return new Project(id, this.api);
   }
 
   projects() {
