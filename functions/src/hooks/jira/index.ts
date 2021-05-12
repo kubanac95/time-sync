@@ -129,7 +129,7 @@ router.post<
       const {
         key: issueKey,
         self: issueLink,
-        fields: { summary, description },
+        fields: { summary, description, resolutiondate },
       } = issue;
 
       logger.log(
@@ -149,6 +149,7 @@ router.post<
           `<p>${description}</p>`,
         ].join("<br />"),
         subscribers: projectData?.activecollab?.subscribers,
+        is_completed: !!resolutiondate,
       };
 
       let activeCollabTask: IActiveCollabTask | undefined;

@@ -15,12 +15,21 @@ interface JiraIssueFieldPriority {
   iconUrl: string;
 }
 
+interface JiraIssueResolution {
+  id: string;
+  self: string;
+  description: string;
+  name: string;
+}
+
 interface JiraIssueFields {
   summary: string;
   created: string;
   description: string;
   labels: string[];
   priority: JiraIssueFieldPriority;
+  resolution?: JiraIssueResolution;
+  resolutiondate?: string;
 }
 
 interface JiraIssue {
