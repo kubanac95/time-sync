@@ -2,8 +2,7 @@ import * as functions from "firebase-functions";
 
 import ActiveCollab, {
   IssueTokenInput,
-  ActiveCollabAccount,
-  IssueTokenResponse,
+  Account as ActiveCollabAccount,
 } from "../../lib/activecollab";
 
 export default functions.https.onCall(
@@ -15,7 +14,7 @@ export default functions.https.onCall(
       );
     }
 
-    let tokenResponse: IssueTokenResponse;
+    let tokenResponse: IActiveCollabIssueTokenResponse;
 
     try {
       tokenResponse = await ActiveCollab.issueToken(data);

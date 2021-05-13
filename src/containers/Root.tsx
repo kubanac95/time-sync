@@ -42,6 +42,9 @@ const PrivateRouter = React.memo(() => {
         <Route path="/task">
           <Page.Tasks />
         </Route>
+        <Route path="/integrations">
+          <Page.Integrations />
+        </Route>
         <Redirect to="/" />
       </Switch>
     </Layout.Private>

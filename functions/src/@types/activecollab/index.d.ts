@@ -13,7 +13,32 @@ interface DataBaseRecord {
   created_by_email: string;
 }
 
-interface ActiveCollabProject extends DataBaseRecord {
+interface ActiveCollabAccountSimple {
+  url: string;
+  name: number;
+  display_name: string;
+  class: string;
+}
+
+interface ActiveCollabUserSimple {
+  first_name: string;
+  last_name: string;
+  intent: string;
+  avatar_url: string;
+}
+
+interface IActiveCollabLoginResponse {
+  is_ok: boolean;
+  accounts: ActiveCollabAccountSimple[];
+  user: ActiveCollabUserSimple;
+}
+
+interface IActiveCollabIssueTokenResponse {
+  is_ok: boolean;
+  token: string;
+}
+
+interface IActiveCollabProject extends DataBaseRecord {
   name: string;
   completed_on: number | null;
   completed_by_id: number | null;

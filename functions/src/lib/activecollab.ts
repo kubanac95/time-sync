@@ -8,22 +8,6 @@ const LoginInputSchema = sup.object({
 
 export type LoginInput = sup.Infer<typeof LoginInputSchema>;
 
-export type LoginResponse = {
-  is_ok: boolean;
-  accounts: {
-    url: string;
-    name: number;
-    display_name: string;
-    class: string;
-  }[];
-  user: {
-    first_name: string;
-    last_name: string;
-    intent: string;
-    avatar_url: string;
-  };
-};
-
 const IssueTokenInputSchema = sup.object({
   intent: sup.string(),
   client_name: sup.string(),
@@ -31,8 +15,6 @@ const IssueTokenInputSchema = sup.object({
 });
 
 export type IssueTokenInput = sup.Infer<typeof IssueTokenInputSchema>;
-
-export type IssueTokenResponse = { is_ok: boolean; token: string };
 
 class Time {
   id: number;
@@ -179,7 +161,7 @@ class Project {
   }
 }
 
-export class ActiveCollabAccount {
+export class Account {
   api: axios.AxiosInstance;
   user_id: number;
 
@@ -195,7 +177,7 @@ export class ActiveCollabAccount {
     });
 
     function onRejected(error: axios.AxiosError) {
-      console.error(`['ActiveCollabAccount] error: `, error);
+      console.error(`['Account] error: `, error);
 
       return Promise.reject(error);
     }
@@ -209,7 +191,7 @@ export class ActiveCollabAccount {
 
   projects() {
     return this.api
-      .get<IActiveCollabResponseDocumentCollection<ActiveCollabProject>>(
+      .get<IActiveCollabResponseDocumentCollection<IActiveCollabProject>>(
         "/projects"
       )
       .then(({ data }) => data);
@@ -227,7 +209,7 @@ class ActiveCollab {
     sup.assert(input, LoginInputSchema);
 
     return axios.default
-      .post<LoginResponse>(
+      .post<IActiveCollabLoginResponse>(
         "https://my.activecollab.com/api/v1/external/login",
         input
       )
@@ -248,7 +230,7 @@ class ActiveCollab {
     sup.assert(input, IssueTokenInputSchema);
 
     return axios.default
-      .post<IssueTokenResponse>(
+      .post<IActiveCollabIssueTokenResponse>(
         `https://app.activecollab.com/${input.client_name}/api/v1/issue-token`,
         input
       )

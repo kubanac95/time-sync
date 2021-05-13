@@ -8,7 +8,7 @@ import { logger } from "firebase-functions";
 
 import * as duration from "dayjs/plugin/duration";
 
-import { ActiveCollabAccount } from "../../lib/activecollab";
+import { Account as ActiveCollabAccount } from "../../lib/activecollab";
 
 import TaskLog from "../../lib/task";
 import TimeLog from "../../lib/time";
