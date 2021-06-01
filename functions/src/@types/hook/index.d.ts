@@ -33,6 +33,7 @@ interface HookDocument {
     token: string;
     accountId: string;
     projectId: string;
+    job_type_id?: number;
   };
   clockify?: {
     projectId: string;

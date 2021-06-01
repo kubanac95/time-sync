@@ -313,7 +313,7 @@ router.post<
       let payload: IActiveCollabTimeCreate = {
         value: dayjs.duration(end.diff(start, "millisecond")).format("HH:mm"),
         record_date: dayjs(worklog.started).format("YYYY-MM-DD"),
-        job_type_id: 12, //React
+        job_type_id: hook?.activecollab?.job_type_id ?? 1,
         summary: worklog.comment || "",
       };
 
@@ -393,7 +393,7 @@ router.post<
       let payload: IActiveCollabTimeCreate = {
         value: dayjs.duration(end.diff(start, "millisecond")).format("HH:mm"),
         record_date: dayjs(worklog.started).format("YYYY-MM-DD"),
-        job_type_id: 12, // React(12), Design & Content & Editing(8)
+        job_type_id: hook?.activecollab?.job_type_id ?? 1,
         summary: worklog.comment || "",
       };
 
