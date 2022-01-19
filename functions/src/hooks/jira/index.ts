@@ -94,6 +94,11 @@ router.post<
     body: { webhookEvent, issue, user },
   } = req;
 
+  logger.log(
+    `[Webhook/Jira] Webhook received "project/${projectId}/issue/${issueId}"`,
+    JSON.stringify(req.body)
+  );
+
   const hook = await getHookDocument(projectId, user.accountId);
 
   if (!hook) {
@@ -289,6 +294,11 @@ router.post<
     params: { projectId, issueId, worklogId },
     body: { webhookEvent, worklog },
   } = req;
+
+  logger.log(
+    `[Webhook/Jira] Webhook received "project/${projectId}/issue/${issueId}/worklog/${worklogId}"`,
+    JSON.stringify(req.body)
+  );
 
   const hook = await getHookDocument(projectId, worklog.author.accountId);
 
