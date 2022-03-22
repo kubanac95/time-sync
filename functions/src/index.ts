@@ -7,5 +7,7 @@ admin.initializeApp();
  */
 export { default as hooks } from "./hooks";
 
+export { default as onAfterCreateUser } from "./collections/users/onAfterCreate";
+
 export { default as authActivecollabLogin } from "./httpsCallable/activecollab/login";
 export { default as authActivecollabIssueToken } from "./httpsCallable/activecollab/issueToken";

@@ -7,17 +7,24 @@ export default functions.https.onCall(async (data: LoginInput, context) => {
     throw new functions.https.HttpsError("unauthenticated", "Unauthenticated");
   }
 
-  let authResponse;
-
   try {
-    authResponse = await ActiveCollab.login(data);
+    const { is_ok, user, accounts } = await ActiveCollab.login(data);
+
+    if (!is_ok) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Invalid credentials"
+      );
+    }
+
+    return {
+      user,
+      accounts,
+    };
   } catch (error) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      error.message,
-      error
+      "Invalid credentials"
     );
   }
-
-  return authResponse;
 });

@@ -3,7 +3,7 @@ import React from "react";
 import firebase from "firebase";
 
 import { useAuthState } from "react-firebase-hooks/auth";
-import { QueryCache, ReactQueryCacheProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { Route, Switch, Redirect, BrowserRouter } from "react-router-dom";
 
 import * as Layout from "../components/Layout";
@@ -11,7 +11,7 @@ import * as AppRoute from "../components/Route";
 
 import * as Page from "../pages";
 
-const queryCache = new QueryCache();
+const queryClient = new QueryClient();
 
 const publicPaths = ["/login", "/register", "/forgot-password"];
 
@@ -42,6 +42,9 @@ const PrivateRouter = React.memo(() => {
         <Route path="/task">
           <Page.Tasks />
         </Route>
+        <Route path="/connections">
+          <Page.Connections />
+        </Route>
         <Route path="/integrations">
           <Page.Integrations />
         </Route>
@@ -59,7 +62,7 @@ const Root = () => {
   }
 
   return (
-    <ReactQueryCacheProvider queryCache={queryCache}>
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Switch>
           <AppRoute.Public path={publicPaths}>
@@ -70,7 +73,7 @@ const Root = () => {
           </AppRoute.Private>
         </Switch>
       </BrowserRouter>
-    </ReactQueryCacheProvider>
+    </QueryClientProvider>
   );
 };
 

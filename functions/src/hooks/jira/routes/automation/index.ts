@@ -1,8 +1,6 @@
 import * as express from "express";
 import * as functions from "firebase-functions";
 
-import { logger } from "firebase-functions";
-
 import { issueAutomation, IssueAutomationInput } from "../../lib/issue";
 import { worklogAutomation, WorklogAutomationInput } from "../../lib/worklog";
 
@@ -36,7 +34,7 @@ router.post<never, any, WorklogAutomationInput>(
       },
     } = req;
 
-    logger.log(
+    functions.logger.log(
       `[Automation/Jira] Webhook received "project/${projectId}/issue/${issueId}/worklog/${worklogId}"`,
       JSON.stringify(req.body)
     );
@@ -65,7 +63,7 @@ router.post<never, any, IssueAutomationInput>("/issue", async (req, res) => {
     },
   } = req;
 
-  logger.log(
+  functions.logger.log(
     `[Automation/Jira] Webhook received "project/${projectId}/issue/${issueId}"`,
     JSON.stringify(req.body)
   );

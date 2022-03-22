@@ -15,3 +15,9 @@ const config = {
 };
 
 firebase.initializeApp(config);
+
+if (window.location.hostname === "localhost") {
+  firebase.auth().useEmulator("http://localhost:9099");
+  firebase.functions().useEmulator("localhost", 5001);
+  firebase.firestore().useEmulator("localhost", 8080);
+}

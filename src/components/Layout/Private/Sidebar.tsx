@@ -31,6 +31,9 @@ const Sidebar = ({ collapsed }: { collapsed: boolean }) => {
             Dashboard
           </NavLink>
         </Menu.Item>
+        <Menu.Item key="/connections" icon={<OrderedListOutlined />}>
+          <NavLink to="/connections">Connections</NavLink>
+        </Menu.Item>
         <Menu.Item key="/task" icon={<OrderedListOutlined />}>
           <NavLink to="/task">Tasks</NavLink>
         </Menu.Item>

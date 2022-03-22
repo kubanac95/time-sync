@@ -1,9 +1,6 @@
 import * as functions from "firebase-functions";
 
-import ActiveCollab, {
-  IssueTokenInput,
-  Account as ActiveCollabAccount,
-} from "../../lib/activecollab";
+import ActiveCollab, { IssueTokenInput } from "../../lib/activecollab";
 
 export default functions.https.onCall(
   async (data: IssueTokenInput, context) => {
@@ -14,31 +11,21 @@ export default functions.https.onCall(
       );
     }
 
-    let tokenResponse: IActiveCollabIssueTokenResponse;
-
     try {
-      tokenResponse = await ActiveCollab.issueToken(data);
+      const { is_ok, token } = await ActiveCollab.issueToken(data);
+
+      if (!is_ok) {
+        throw new functions.https.HttpsError(
+          "invalid-argument",
+          "Invalid input"
+        );
+      }
+
+      return {
+        token,
+      };
     } catch (error) {
-      throw new functions.https.HttpsError(
-        "invalid-argument",
-        error.message,
-        error
-      );
+      throw new functions.https.HttpsError("invalid-argument", error.message);
     }
-
-    const { token } = tokenResponse;
-
-    const account = new ActiveCollabAccount({
-      token,
-      accountId: data.client_name,
-    });
-
-    const projects = await account.projects();
-
-    return {
-      token: tokenResponse.token,
-      accountId: data.client_vendor,
-      projects,
-    };
   }
 );

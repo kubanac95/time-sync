@@ -5,3 +5,4 @@ export { default as ForgotPassword } from "./ForgotPassword";
 export { default as Tasks } from "./Tasks";
 export { default as Integrations } from "./Integrations";
 export { default as Dashboard } from "./Dashboard";
+export { default as Connections } from "./Connections";

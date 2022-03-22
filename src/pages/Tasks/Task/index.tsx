@@ -37,9 +37,10 @@ const ProjectSelect = (props: any) => {
 
   const workspace = form.getFieldValue(["clockify", "workspace"]);
 
-  const { data: projects } = useQuery<TAPIResponse<IWorkspace[]>["data"]>(
+  const { data: projects } = useQuery(
     [`workspaces/${workspace}/projects`],
-    (key: string) => clockify.get(`/${key}`).then(({ data }) => data),
+    ({ queryKey: [key] }) =>
+      clockify.get<IWorkspace[]>(`/${key}`).then(({ data }) => data),
     {
       enabled: !!workspace,
     }
@@ -61,9 +62,8 @@ const ProjectSelect = (props: any) => {
 const Dashboard = React.memo(() => {
   const { taskId } = useParams<{ taskId?: string }>();
 
-  const { data: workspaces } = useQuery<TAPIResponse<IWorkspace[]>["data"]>(
-    ["workspaces"],
-    () => clockify.get("/workspaces").then(({ data }) => data)
+  const { data: workspaces } = useQuery(["workspaces"], () =>
+    clockify.get<IWorkspace[]>("/workspaces").then(({ data }) => data)
   );
 
   const [taskData] = useDocumentDataOnce(
