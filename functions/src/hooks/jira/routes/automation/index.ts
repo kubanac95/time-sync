@@ -44,7 +44,7 @@ router.post<never, any, WorklogAutomationInput>(
     try {
       await worklogAutomation(req.body);
 
-      res.status(200).json({
+      return res.status(200).json({
         message: "Success",
       });
     } catch (error) {
@@ -73,7 +73,7 @@ router.post<never, any, IssueAutomationInput>("/issue", async (req, res) => {
   try {
     await issueAutomation(req.body);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Success",
     });
   } catch (error) {
