@@ -18,7 +18,7 @@ router.use((req, res, next) => {
   /**
    * @todo TODO - make this configurable per project
    */
-  if (token !== config.JIRA_AUTOMATION_API_KEY) {
+  if (token !== config?.jira?.automation?.api_key) {
     return res.sendStatus(403);
   }
 
