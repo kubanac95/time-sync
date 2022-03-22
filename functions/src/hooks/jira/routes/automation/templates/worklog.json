@@ -1,0 +1,25 @@
+{
+  "eventType": "{{eventType}}",
+  "issue": {
+    "id": "{{issue.id}}",
+    "key": "{{issue.key}}",
+    "self": "{{issue.self}}",
+    "fields": {
+      "summary": "{{issue.fields.summary}}",
+      "description": "{{issue.fields.description}}"
+    }
+  },
+  "project": {
+    "id": "{{project.id}}"
+  },
+  "worklog": {
+    "id": "{{worklog.id}}",
+    "comment": "{{worklog.comment}}",
+    "started": "{{worklog.started}}",
+    "timeSpent": "{{worklog.timeSpent}}",
+    "timeSpentSeconds": "{{worklog.timeSpentSeconds}}",
+    "author": {
+      "accountId": "{{worklog.author.accountId}}"
+    }
+  }
+}
