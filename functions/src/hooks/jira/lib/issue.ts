@@ -6,7 +6,7 @@ import ProjectLog from "../../../lib/project";
 import { createActiveCollabProjectInstance, getHookDocument } from "./common";
 
 export interface IssueAutomationInput {
-  webhookEvent: JiraWebhookEventIssueType;
+  eventType: JiraWebhookEventIssueType;
   project: Pick<JiraProject, "id">;
   issue: Pick<JiraIssue, "id" | "key" | "self"> & {
     fields: Pick<JiraIssueFields, "summary" | "description" | "resolutiondate">;
@@ -18,7 +18,7 @@ export const issueAutomation = async (input: IssueAutomationInput) => {
   const {
     user,
     issue,
-    webhookEvent,
+    eventType,
     issue: { id: issueId },
     project: { id: projectId },
   } = input;
@@ -40,7 +40,7 @@ export const issueAutomation = async (input: IssueAutomationInput) => {
 
   const AC = createActiveCollabProjectInstance(hook.activecollab);
 
-  switch (webhookEvent) {
+  switch (eventType) {
     case "jira:issue_created": {
       const {
         key: issueKey,

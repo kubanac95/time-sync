@@ -13,7 +13,7 @@ import { createActiveCollabProjectInstance, getHookDocument } from "./common";
 dayjs.extend(duration);
 
 export interface WorklogAutomationInput {
-  webhookEvent: JiraWebhookEventWorklogType;
+  eventType: JiraWebhookEventWorklogType;
   project: Pick<JiraProject, "id">;
   issue: Pick<JiraIssue, "id"> & {
     key?: JiraIssue["key"];
@@ -28,7 +28,7 @@ export interface WorklogAutomationInput {
 
 export const worklogAutomation = async (input: WorklogAutomationInput) => {
   const {
-    webhookEvent,
+    eventType,
     issue,
     issue: { id: issueId },
     project: { id: projectId },
@@ -56,7 +56,7 @@ export const worklogAutomation = async (input: WorklogAutomationInput) => {
     .filter(Boolean)
     .join(": ");
 
-  switch (webhookEvent) {
+  switch (eventType) {
     case "worklog_created": {
       const taskLogSnapshot = await TaskLog.findOne("jira.id", issueId);
 

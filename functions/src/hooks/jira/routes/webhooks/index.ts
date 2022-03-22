@@ -37,7 +37,7 @@ router.post<{ projectId: string; issueId: string }, any, JiraWebhookIssueEvent>(
 
     try {
       await issueAutomation({
-        webhookEvent,
+        eventType: webhookEvent,
         project: {
           id: projectId,
         },
@@ -76,7 +76,7 @@ router.post<
 
   try {
     await worklogAutomation({
-      webhookEvent,
+      eventType: webhookEvent,
       worklog,
       project: {
         id: projectId,
