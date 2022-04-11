@@ -8,6 +8,12 @@ const config = functions.config();
 
 const router = express.Router();
 
+router.use((req, _res, next) => {
+  functions.logger.log(req.body);
+
+  next();
+});
+
 router.use(express.json());
 
 router.use((req, res, next) => {
@@ -36,7 +42,7 @@ router.post<never, any, WorklogAutomationInput>(
 
     functions.logger.log(
       `[Automation/Jira] Webhook received "project/${projectId}/issue/${issueId}/worklog/${worklogId}"`,
-      JSON.stringify(req.body)
+      req.body
     );
 
     try {
@@ -65,7 +71,7 @@ router.post<never, any, IssueAutomationInput>("/issue", async (req, res) => {
 
   functions.logger.log(
     `[Automation/Jira] Webhook received "project/${projectId}/issue/${issueId}"`,
-    JSON.stringify(req.body)
+    req.body
   );
 
   try {
