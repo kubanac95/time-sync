@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as express from "express";
 import * as functions from "firebase-functions";
 
@@ -7,12 +8,6 @@ import { worklogAutomation, WorklogAutomationInput } from "../../lib/worklog";
 const config = functions.config();
 
 const router = express.Router();
-
-router.use((req, _res, next) => {
-  functions.logger.log(req.body);
-
-  next();
-});
 
 router.use(express.json());
 
@@ -45,6 +40,18 @@ router.post<never, any, WorklogAutomationInput>(
       req.body
     );
 
+    if (req?.body?.issue?.fields?.description) {
+      try {
+        const decodedDescription = encodeURIComponent(
+          req?.body?.issue?.fields?.description ?? ""
+        );
+
+        _.set(req.body, "issue.fields.description", decodedDescription);
+      } catch (error) {
+        return res.sendStatus(500);
+      }
+    }
+
     try {
       await worklogAutomation(req.body);
 
@@ -73,6 +80,18 @@ router.post<never, any, IssueAutomationInput>("/issue", async (req, res) => {
     `[Automation/Jira] Webhook received "project/${projectId}/issue/${issueId}"`,
     req.body
   );
+
+  if (req?.body?.issue?.fields?.description) {
+    try {
+      const decodedDescription = encodeURIComponent(
+        req?.body?.issue?.fields?.description ?? ""
+      );
+
+      _.set(req.body, "issue.fields.description", decodedDescription);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  }
 
   try {
     await issueAutomation(req.body);

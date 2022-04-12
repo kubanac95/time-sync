@@ -17,3 +17,5 @@ Base URL
 https://support.atlassian.com/cloud-automation/docs/jira-smart-values-issues/
 
 firebase functions:config:set jira.automation.api_key=""
+
+https://6c01-92-60-226-23.ngrok.io/time-sync-a450f/us-central1/hooks/jira/automation/issue
