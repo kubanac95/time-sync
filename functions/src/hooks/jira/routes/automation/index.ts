@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import * as axios from "axios";
 import * as express from "express";
 import * as functions from "firebase-functions";
 
@@ -59,6 +60,13 @@ router.post<never, any, WorklogAutomationInput>(
         message: "Success",
       });
     } catch (error) {
+      if (axios.isAxiosError(error)) {
+        functions.logger.log(
+          `[Automation/Jira] Webhook error "project/${projectId}/issue/${issueId}/worklog/${worklogId}"`,
+          JSON.stringify(error?.response?.data ?? error?.request?.data)
+        );
+      }
+
       if (error instanceof Error) {
         return res.status(500).json({ message: error.message });
       }
@@ -100,6 +108,13 @@ router.post<never, any, IssueAutomationInput>("/issue", async (req, res) => {
       message: "Success",
     });
   } catch (error) {
+    if (axios.isAxiosError(error)) {
+      functions.logger.log(
+        `[Automation/Jira] Webhook error "project/${projectId}/issue/${issueId}"`,
+        JSON.stringify(error?.response?.data ?? error?.request?.data)
+      );
+    }
+
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
     }

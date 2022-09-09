@@ -177,7 +177,10 @@ export class Account {
     });
 
     function onRejected(error: axios.AxiosError) {
-      console.error(`['Account] error: `, error);
+      console.log(
+        `[ActiveCollab] onRejected:`,
+        JSON.stringify(error?.response?.data ?? error?.request)
+      );
 
       return Promise.reject(error);
     }
