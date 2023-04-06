@@ -14,6 +14,24 @@ export interface IssueAutomationInput {
   user: Pick<JiraUser, "accountId">;
 }
 
+/**
+ * Parse jira encoded description to match active collab expectations
+ *
+ * @param raw Raw description comming from jira webhook
+ * @returns
+ */
+function parseDescription(raw: string): string {
+  let description = raw;
+
+  try {
+    const decoded = decodeURIComponent(decodeURIComponent(description));
+
+    description = decoded.replace(/\+/g, " ");
+  } catch {}
+
+  return description;
+}
+
 export const issueAutomation = async (input: IssueAutomationInput) => {
   const {
     user,
@@ -62,7 +80,7 @@ export const issueAutomation = async (input: IssueAutomationInput) => {
               ${issueKey}
             </a>
           </p>`,
-          description && `<p>${description}</p>`,
+          description && `<p>${parseDescription(description)}</p>`,
         ].join("<br />"),
         subscribers: projectData?.activecollab?.subscribers,
       });
@@ -103,7 +121,7 @@ export const issueAutomation = async (input: IssueAutomationInput) => {
               ${issueKey}
             </a>
           </p>`,
-          description && `<p>${description}</p>`,
+          description && `<p>${parseDescription(description)}</p>`,
         ].join("<br />"),
         subscribers: projectData?.activecollab?.subscribers,
       };
