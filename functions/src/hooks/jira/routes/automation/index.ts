@@ -60,7 +60,7 @@ router.post<never, any, WorklogAutomationInput>(
         message: "Success",
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (axios.default.isAxiosError(error)) {
         functions.logger.log(
           `[Automation/Jira] Webhook error "project/${projectId}/issue/${issueId}/worklog/${worklogId}"`,
           JSON.stringify(error?.response?.data ?? error?.request?.data)
@@ -108,7 +108,7 @@ router.post<never, any, IssueAutomationInput>("/issue", async (req, res) => {
       message: "Success",
     });
   } catch (error) {
-    if (axios.isAxiosError(error)) {
+    if (axios.default.isAxiosError(error)) {
       functions.logger.log(
         `[Automation/Jira] Webhook error "project/${projectId}/issue/${issueId}"`,
         JSON.stringify(error?.response?.data ?? error?.request?.data)
